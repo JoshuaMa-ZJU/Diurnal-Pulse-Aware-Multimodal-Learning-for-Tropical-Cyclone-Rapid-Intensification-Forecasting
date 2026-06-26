@@ -1,0 +1,29 @@
+cff-version: 1.2.0
+message: "If you use this repository, please cite the associated paper."
+title: "Diurnal Pulse-Aware Multimodal Learning with Cross-Attention and Masked Convolution for Tropical Cyclone Rapid Intensification Forecasting"
+authors:
+  - family-names: Ma
+    given-names: Zhaoyang
+  - family-names: Tang
+    given-names: Huan
+  - family-names: Lin
+    given-names: Jianmin
+  - family-names: Ma
+    given-names: Dongfang
+year: 2026
+repository-code: "https://github.com/JoshuaMa-ZJU/Diurnal-Pulse-Aware-Multimodal-Learning-for-Tropical-Cyclone-Rapid-Intensification-Forecasting"
+preferred-citation:
+  type: article
+  title: "Diurnal Pulse-Aware Multimodal Learning with Cross-Attention and Masked Convolution for Tropical Cyclone Rapid Intensification Forecasting"
+  authors:
+    - family-names: Ma
+      given-names: Zhaoyang
+    - family-names: Tang
+      given-names: Huan
+    - family-names: Lin
+      given-names: Jianmin
+    - family-names: Ma
+      given-names: Dongfang
+  journal: "Expert Systems with Applications"
+  year: 2026
+  notes: "Under review"
