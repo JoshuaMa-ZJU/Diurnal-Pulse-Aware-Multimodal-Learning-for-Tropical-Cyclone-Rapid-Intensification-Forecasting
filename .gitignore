@@ -25,3 +25,8 @@ checkpoints/
 .DS_Store
 Thumbs.db
 .vscode/
+
+# Small release files tracked in this repository
+!data/small/
+!data/small/*.npy
+!data/small/*.txt

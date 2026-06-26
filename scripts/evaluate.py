@@ -37,7 +37,7 @@ def report(name, pred_path, label_path):
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Evaluate TC intensity prediction arrays.")
-    parser.add_argument("--data-dir", type=Path, default=Path("data/raw"))
+    parser.add_argument("--data-dir", type=Path, default=Path("data/small"))
     return parser.parse_args()
 
 

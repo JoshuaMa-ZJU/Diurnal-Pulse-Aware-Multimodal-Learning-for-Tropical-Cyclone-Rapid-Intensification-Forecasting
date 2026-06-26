@@ -34,11 +34,14 @@ The proposed model forecasts tropical cyclone (TC) intensity at 6-, 12-, 18-, an
 
 ## Dataset
 
-Large data files are hosted on IEEE DataPort rather than stored in this GitHub repository.
+Small data files and saved prediction arrays are included directly in this repository under `data/small/`. Large files are hosted on Google Drive rather than stored in GitHub.
 
-**IEEE DataPort dataset:** https://ieee-dataport.org/documents/diurnal-pulse-aware-image-feature-extraction
+Large files:
 
-After downloading the dataset, place the files under `data/raw/`:
+- `dp.zip`: https://drive.google.com/file/d/1fWDIZUbZn1Bt3tyOCKruZAfaidn97IAy/view?usp=drive_link
+- `x.rar`: https://drive.google.com/file/d/1fc1DzjvZxJmQepbMvUnk6lcRXUlWlG37/view?usp=drive_link
+
+For full training, download and extract the large files, then place all required files under `data/raw/`:
 
 ```text
 data/raw/
@@ -50,6 +53,19 @@ data/raw/
 |-- ground_truth.npy
 |-- prediction_result_ri.npy
 `-- ground_truth_ri.npy
+```
+
+The following small files are already available in `data/small/`:
+
+```text
+data/small/
+|-- x_2d.npy
+|-- wind_y.npy
+|-- prediction_result.npy
+|-- ground_truth.npy
+|-- prediction_result_ri.npy
+|-- ground_truth_ri.npy
+`-- readme.txt
 ```
 
 The processed dataset contains 13,336 samples from January 2019 to September 2024, including 3,641 RI samples. TC cases cover six basins: Western Pacific, Eastern Pacific, Southern Pacific, North Indian, South Indian, and North Atlantic.
@@ -100,7 +116,7 @@ Default training settings:
 To evaluate saved prediction arrays:
 
 ```bash
-python scripts/evaluate.py --data-dir data/raw
+python scripts/evaluate.py --data-dir data/small
 ```
 
 The script reports MAE and RMSE at 6-, 12-, 18-, and 24-hour lead times for the full test set and, when available, the RI subset.
@@ -119,7 +135,7 @@ The model contains four main components:
 ```bibtex
 @article{ma2026diurnal,
   title   = {Diurnal Pulse-Aware Multimodal Learning with Cross-Attention and Masked Convolution for Tropical Cyclone Rapid Intensification Forecasting},
-  author  = {Ma, Zhaoyang and Tang, Huan and Lin, Jianmin and Ma, Dongfang},
+  author  = {Anonymous},
   journal = {Expert Systems with Applications},
   year    = {2026},
   note    = {Under review}
@@ -128,8 +144,8 @@ The model contains four main components:
 
 ## License
 
-The code is released under the MIT License. The dataset is distributed separately through IEEE DataPort and should be used according to the license and terms provided there.
+The code is released under the MIT License. Large data files are distributed separately through Google Drive links listed above.
 
 ## Contact
 
-For questions, please contact the corresponding author listed in the paper.
+For questions, please use the repository issue tracker during review.
