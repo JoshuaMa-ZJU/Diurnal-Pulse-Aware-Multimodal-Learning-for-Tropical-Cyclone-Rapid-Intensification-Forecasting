@@ -2,7 +2,7 @@
 
 The large data files for this project are not stored in GitHub. They are hosted on IEEE DataPort.
 
-**IEEE DataPort dataset:** TODO: add IEEE DataPort DOI or URL
+**IEEE DataPort dataset:** https://ieee-dataport.org/documents/diurnal-pulse-aware-image-feature-extraction
 
 Place the downloaded files in this directory as follows:
 

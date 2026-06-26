@@ -36,7 +36,7 @@ The proposed model forecasts tropical cyclone (TC) intensity at 6-, 12-, 18-, an
 
 Large data files are hosted on IEEE DataPort rather than stored in this GitHub repository.
 
-**IEEE DataPort dataset:** TODO: add IEEE DataPort DOI or URL
+**IEEE DataPort dataset:** https://ieee-dataport.org/documents/diurnal-pulse-aware-image-feature-extraction
 
 After downloading the dataset, place the files under `data/raw/`:
 
