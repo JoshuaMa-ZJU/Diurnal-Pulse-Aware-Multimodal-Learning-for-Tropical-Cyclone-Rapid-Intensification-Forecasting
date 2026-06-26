@@ -4,7 +4,7 @@ from tensorflow import keras
 from tensorflow.keras import layers
 
 
-def create_circular_masks(size=128, center=None):
+def create_circular_masks(size=256, center=None):
     """Create six radial masks for storm-centered cloud features."""
     if center is None:
         center = (size // 2, size // 2)
@@ -12,11 +12,10 @@ def create_circular_masks(size=128, center=None):
     radius = np.sqrt((yy - center[0]) ** 2 + (xx - center[1]) ** 2)
 
     masks = np.zeros((size, size, 6), dtype=np.float32)
-    bins = [10, 20, 30, 40, 50]
+    bins = [20, 40, 60, 80, 100, 120]
     masks[:, :, 0] = radius < bins[0]
     for idx in range(1, len(bins)):
         masks[:, :, idx] = (radius >= bins[idx - 1]) & (radius < bins[idx])
-    masks[:, :, 5] = radius >= bins[-1]
     return masks
 
 
@@ -143,11 +142,11 @@ def build_model(
     sss = layers.Lambda(lambda x: x[:, :, :, :, 8:9])(gridded_inputs)
 
     img = layers.TimeDistributed(
-        layers.Conv2D(1, 3, strides=2, padding="same", use_bias=False)
+        layers.Conv2D(1, 3, strides=1, padding="same", use_bias=False)
     )(img)
     img = layers.Multiply()([img, _expand_mask(cmask)])
-    img_weights = layers.TimeDistributed(layers.GlobalMaxPooling2D())(img)
-    img_weights = layers.TimeDistributed(layers.Dense(6, activation="softmax"))(img_weights)
+    img_weights = layers.TimeDistributed(layers.GlobalAveragePooling2D())(img)
+    img_weights = layers.TimeDistributed(layers.Dense(6, activation="sigmoid"))(img_weights)
     img_weights = layers.Reshape((history_steps, 1, 1, 6))(img_weights)
     img = layers.Multiply()([img_weights, img])
     img = layers.Lambda(lambda x: tf.reduce_sum(x, axis=-1, keepdims=True))(img)
@@ -184,12 +183,14 @@ def build_model(
     gph = layers.TimeDistributed(layers.Conv3D(1, 3, padding="same"))(gph)
     gph = layers.Reshape((history_steps, 128, 128, 64))(gph)
     gph = layers.TimeDistributed(layers.Conv2D(1, 1, padding="same"))(gph)
-    gph = layers.Multiply()([gph, _expand_mask(dmask)])
-    gph_weights = layers.TimeDistributed(layers.GlobalMaxPooling2D())(gph)
+    gph_original = gph
+    gph_masked = layers.Multiply()([gph, _expand_mask(dmask)])
+    gph_weights = layers.TimeDistributed(layers.GlobalAveragePooling2D())(gph_masked)
     gph_weights = layers.TimeDistributed(layers.Dense(8, activation="softmax"))(gph_weights)
     gph_weights = layers.Reshape((history_steps, 1, 1, 8))(gph_weights)
-    gph = layers.Multiply()([gph_weights, gph])
-    gph = layers.Lambda(lambda x: tf.reduce_sum(x, axis=-1, keepdims=True))(gph)
+    gph_masked = layers.Multiply()([gph_weights, gph_masked])
+    gph_masked = layers.Lambda(lambda x: tf.reduce_sum(x, axis=-1, keepdims=True))(gph_masked)
+    gph = layers.Concatenate(axis=-1)([gph_original, gph_masked])
     gph = layers.TimeDistributed(layers.Conv2D(64, 1, strides=2, padding="same"))(gph)
 
     img = layers.TimeDistributed(layers.GlobalMaxPooling2D())(img)

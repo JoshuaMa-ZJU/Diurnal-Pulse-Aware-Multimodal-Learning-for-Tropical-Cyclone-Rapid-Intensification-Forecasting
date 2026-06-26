@@ -17,12 +17,42 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Train the TC intensity forecasting model.")
     parser.add_argument("--data-dir", type=Path, default=Path("data/raw"))
     parser.add_argument("--output-dir", type=Path, default=Path("outputs"))
+    parser.add_argument(
+        "--split-dir",
+        type=Path,
+        default=None,
+        help=(
+            "Directory containing event-level train_indices.npy, val_indices.npy, "
+            "and test_indices.npy. If omitted, a 4:1:1 sequential split is used."
+        ),
+    )
     parser.add_argument("--epochs", type=int, default=800)
     parser.add_argument("--batch-size", type=int, default=16)
-    parser.add_argument("--test-fraction", type=float, default=1 / 6)
-    parser.add_argument("--validation-split", type=float, default=0.2)
     parser.add_argument("--no-mixed-precision", action="store_true")
     return parser.parse_args()
+
+
+def load_split_indices(args, n_total):
+    if args.split_dir is not None:
+        return (
+            np.load(args.split_dir / "train_indices.npy"),
+            np.load(args.split_dir / "val_indices.npy"),
+            np.load(args.split_dir / "test_indices.npy"),
+        )
+
+    n_unit = n_total // 6
+    train_end = n_unit * 4
+    val_end = n_unit * 5
+    return (
+        np.arange(0, train_end),
+        np.arange(train_end, val_end),
+        np.arange(val_end, n_total),
+    )
+
+
+def align_indices(indices, batch_size):
+    n = batch_aligned_length(len(indices), batch_size)
+    return indices[:n]
 
 
 def main():
@@ -37,12 +67,13 @@ def main():
     dp = np.load(args.data_dir / "dp.npy", mmap_mode="r")
     y = np.load(args.data_dir / "wind_y.npy", mmap_mode="r")
 
-    n_total = len(y)
-    n_test = batch_aligned_length(int(n_total * args.test_fraction), args.batch_size)
-    n_train = batch_aligned_length(n_total - n_test, args.batch_size)
+    train_indices, val_indices, test_indices = load_split_indices(args, len(y))
+    train_indices = align_indices(train_indices, args.batch_size)
+    val_indices = align_indices(val_indices, args.batch_size)
+    test_indices = align_indices(test_indices, args.batch_size)
 
-    train_slice = slice(0, n_train)
-    decoder_inputs = np.asarray(x_2d[train_slice, :, 0]).reshape(n_train, 4, 1)
+    decoder_inputs = np.asarray(x_2d[train_indices, :, 0]).reshape(len(train_indices), 4, 1)
+    val_decoder_inputs = np.asarray(x_2d[val_indices, :, 0]).reshape(len(val_indices), 4, 1)
 
     model = build_model()
     model.compile(optimizer="adam", loss="mae", metrics=["mae", "mse"])
@@ -74,35 +105,42 @@ def main():
 
     model.fit(
         [
-            np.asarray(x[train_slice]).astype(np.float16),
-            np.asarray(x_2d[train_slice]).astype(np.float16),
-            np.asarray(dp[train_slice]).astype(np.float16),
+            np.asarray(x[train_indices]).astype(np.float16),
+            np.asarray(x_2d[train_indices]).astype(np.float16),
+            np.asarray(dp[train_indices]).astype(np.float16),
             decoder_inputs.astype(np.float16),
         ],
-        np.asarray(y[train_slice]).astype(np.float16),
+        np.asarray(y[train_indices]).astype(np.float16),
         batch_size=args.batch_size,
         epochs=args.epochs,
         callbacks=callbacks,
-        validation_split=args.validation_split,
+        validation_data=(
+            [
+                np.asarray(x[val_indices]).astype(np.float16),
+                np.asarray(x_2d[val_indices]).astype(np.float16),
+                np.asarray(dp[val_indices]).astype(np.float16),
+                val_decoder_inputs.astype(np.float16),
+            ],
+            np.asarray(y[val_indices]).astype(np.float16),
+        ),
         shuffle=True,
         verbose=1,
     )
 
     model.load_weights(args.output_dir / "model.weights.h5")
-    test_slice = slice(n_total - n_test, n_total)
-    test_x_2d = np.asarray(x_2d[test_slice]).astype(np.float16)
-    test_decoder_inputs = test_x_2d[:, :, 0].reshape(n_test, 4, 1)
+    test_x_2d = np.asarray(x_2d[test_indices]).astype(np.float16)
+    test_decoder_inputs = test_x_2d[:, :, 0].reshape(len(test_indices), 4, 1)
     predictions = model.predict(
         [
-            np.asarray(x[test_slice]).astype(np.float16),
+            np.asarray(x[test_indices]).astype(np.float16),
             test_x_2d,
-            np.asarray(dp[test_slice]).astype(np.float16),
+            np.asarray(dp[test_indices]).astype(np.float16),
             test_decoder_inputs.astype(np.float16),
         ],
         batch_size=4,
     )
     np.save(args.output_dir / "prediction_result.npy", predictions.squeeze(-1))
-    np.save(args.output_dir / "ground_truth.npy", np.asarray(y[test_slice]))
+    np.save(args.output_dir / "ground_truth.npy", np.asarray(y[test_indices]))
 
 
 if __name__ == "__main__":

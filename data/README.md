@@ -38,7 +38,7 @@ data/small/
 
 - `x.npy`: shape `(13336, 4, 256, 256, 9)`. Channel 0 is IR satellite imagery, channels 1-6 are GPH fields, channel 7 is SST, and channel 8 is SSS.
 - `x_2d.npy`: shape `(13336, 4, 6)`. Historical 2D predictors, including MSW, latitude, longitude, year, month, and day/time information.
-- `dp.npy`: shape `(13336, 4, 256, 256)`. Diurnal-pulse feature maps.
+- `dp.npy`: shape `(13336, 4, 256, 256)`. Preprocessed diurnal-pulse feature maps generated before model training.
 - `wind_y.npy`: shape `(13336, 4)`. Ground-truth future MSW labels.
 - `prediction_result.npy` and `ground_truth.npy`: saved prediction and label arrays for the overall test set.
 - `prediction_result_ri.npy` and `ground_truth_ri.npy`: saved prediction and label arrays for the RI subset.
