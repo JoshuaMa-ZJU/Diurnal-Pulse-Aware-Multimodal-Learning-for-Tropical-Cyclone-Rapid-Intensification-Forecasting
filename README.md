@@ -21,7 +21,6 @@ The proposed model forecasts tropical cyclone (TC) intensity at 6-, 12-, 18-, an
 |-- README.md
 |-- requirements.txt
 |-- LICENSE
-|-- CITATION.cff
 |-- data/
 |   `-- README.md
 |-- src/
@@ -129,18 +128,6 @@ The model contains four main components:
 2. **Atmospheric feature extraction module**: extracts storm-structure information from GPH fields using directional masks.
 3. **Oceanic feature extraction module**: models SST-SSS interactions using symmetric cross-attention.
 4. **Diurnal-pulse and RI detection module**: injects DP representations into the Transformer encoder-decoder to improve responsiveness to RI signals.
-
-## Citation
-
-```bibtex
-@article{ma2026diurnal,
-  title   = {Diurnal Pulse-Aware Multimodal Learning with Cross-Attention and Masked Convolution for Tropical Cyclone Rapid Intensification Forecasting},
-  author  = {Anonymous},
-  journal = {Expert Systems with Applications},
-  year    = {2026},
-  note    = {Under review}
-}
-```
 
 ## License
 
