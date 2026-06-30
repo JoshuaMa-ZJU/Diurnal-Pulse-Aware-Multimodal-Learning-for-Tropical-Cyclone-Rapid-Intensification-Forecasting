@@ -2,7 +2,7 @@
 
 This repository provides code and documentation for the paper:
 
-**Diurnal Pulse-Aware Multimodal Learning with Cross-Attention and Masked Convolution for Tropical Cyclone Rapid Intensification Forecasting**
+**Knowledge-Guided Diurnal Pulse-Aware Multimodal Learning for Tropical Cyclone Rapid Intensification Forecasting**
 
 The proposed model forecasts tropical cyclone (TC) intensity at 6-, 12-, 18-, and 24-hour lead times, with special emphasis on rapid intensification (RI). It integrates infrared satellite imagery, geopotential height fields, sea surface temperature, sea surface salinity, diurnal-pulse features, historical intensity, location, and temporal information.
 
